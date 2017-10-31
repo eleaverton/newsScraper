@@ -6,10 +6,10 @@ var cheerio = require("cheerio");
 var mongoose = require("mongoose");
 
 // Require all models
-// var db = require("./models");
+var db = require("./models");
 
 var PORT = process.env.port || 3000;
-
+ 
 // Initialize Express
 var app = express();
 
@@ -19,12 +19,15 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 // Use express.static to serve the public folder as a static directory
 app.use(express.static("public"));
+//Set handlebars as view engine
+app.engine("handlebars", handlebars({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
-// mongoose.Promise = Promise;
-// mongoose.connect("mongodb://localhost/newsscraper", {
-//   useMongoClient: true
-// });
+mongoose.Promise = Promise;
+mongoose.connect("mongodb://localhost/newsscraper", {
+  useMongoClient: true
+});
 
 // Routes
 
@@ -39,17 +42,39 @@ app.get("/", function(req,res){
 			var title = $(element).children(".headline").text();
 			var summary = $(element).children(".summary").text();
 			var link = $(element).children(".headline").attr("href");
-			results.push({
-				title:title,
-				summary:summary,
-				link:link
-			});
+			if(title !=""){
+				results.push({
+					title:title,
+					summary:summary,
+					link:link
+				});
+			}
+			
 		});
 		console.log(results);
+		res.render("scraped", { results })
 	});
 });
 
 // A GET route for getting all saved Articles from the db
+app.get("/saved", function(req,res){
+	db.Article
+    .find({})
+    .then(function(dbArticle) {
+      // If we were able to successfully find Articles, send them back to the client
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+
+})
+
+//A POST route for saving an article
+app.post("/save", function(req,res){
+	db.Article.create
+})
 
 // A GET route for Notes for a specific article
 
