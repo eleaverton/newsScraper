@@ -1,8 +1,3 @@
-<div class="jumbotron" style="padding-left: 100px;">
-    <h1>Your Saved Articles</h1>
-    
-    
-</div>
 <div class="container">
     {{#each dbArticle}}
     <div class="panel panel-primary">
@@ -14,11 +9,16 @@
         </div>
         <div class="panel-body" style="{height: 200px;}">
             {{this.summary}}
-            <button class="btn btn-default pull-right btn-sm seeNotes" id={{this.id}}>
-            Article Notes</button>
-            <button class="btn btn-default pull-right btn-sm delete" id={{this.id}}>
-            Delete</button>
+
+            {{#if this.note}}
+            {{this.note}}
+            {{/if}}
+            
         </div>
+        <form>
+            <textarea class="form-control" rows="3"></textarea>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
     </div>
     {{/each}}
 </div>
